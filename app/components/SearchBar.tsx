@@ -17,7 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onRatingChange,
 }) => {
   return (
-    <div className=" flex  items-center gap-5">
+    <div className=" grid grid-cols-1 md:grid-cols-3  items-center gap-[30px] md:gap-0">
       {/* Search Input */}
       <input
         type="text"
