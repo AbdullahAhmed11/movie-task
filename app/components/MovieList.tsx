@@ -1,69 +1,86 @@
-'use client';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { fetchMovies } from '../utils/api';
 import SearchBar from './SearchBar';
 
 type Movie = {
   id: number;
   title: string;
   poster: string;
+  awards: string;
   releaseDate: string;
   rating: number;
-  genre: string; // assuming genre is a string, adjust based on your API response
+  genre: string[];
 };
 
 const MovieList = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>(''); // State for search query
-
-  const fetchMovies = async (query: string) => {
-    // setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get(
-        `https://cors-anywhere.herokuapp.com/https://freetestapi.com/api/v1/movies?search=${query}`
-      );
-      setMovies(response.data);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }    } 
-    finally {
-      setLoading(false);
-    }
-  };
+  const [searchQuery, setSearchQuery] = useState('');
+  const [genre, setGenre] = useState('');
+  const [rating, setRating] = useState(0);
 
   useEffect(() => {
-    fetchMovies(searchQuery); // Fetch movies based on the search query
-  }, [searchQuery]); // Re-fetch movies when the search query changes
+    const loadMovies = async () => {
+      setError(null);
+      try {
+        const data = await fetchMovies(searchQuery);
+        setMovies(data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally  {
+        setLoading(false)
+      }
+    };
+
+    loadMovies();
+  }, [searchQuery]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value); // Update the search query state
+    setSearchQuery(event.target.value);
   };
+
+  const handleGenreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGenre(event.target.value);
+  };
+
+  const handleRatingChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setRating(parseInt(event.target.value, 10));
+  };
+
+  const filteredMovies = movies.filter((movie) => {
+    const matchesGenre = genre ? movie.genre.includes(genre) : true;
+    const matchesRating = rating ? movie.rating >= rating : true;
+    return matchesGenre && matchesRating;
+  });
 
   if (loading) return <div className="text-center p-4">Loading...</div>;
   if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   return (
     <div>
-      {/* Search Bar */}
       <div className="p-4">
-        <SearchBar onChange={handleSearchChange} value={searchQuery} />
+        <SearchBar
+          value={searchQuery}
+          onChange={handleSearchChange}
+          genre={genre}
+          onGenreChange={handleGenreChange}
+          rating={rating}
+          onRatingChange={handleRatingChange}
+        />
       </div>
-
-      {/* Movie Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-        {movies.map((movie) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        {filteredMovies.map((movie) => (
           <div key={movie.id} className="border rounded p-4 bg-white shadow-lg">
-            <img src={movie.poster} alt={movie.title} className="w-full h-[200px] mb-2" />
+            <img
+              src={movie.poster}
+              alt={movie.title}
+              className="w-full h-[200px] mb-2"
+            />
             <h3 className="text-lg font-semibold">{movie.title}</h3>
-            <p>Release Date: {movie.releaseDate}</p>
-            <p>Rating: {movie.rating}</p>
-            <p>Genre: {movie.genre}</p>
+            <p>awards: {movie.awards}</p>
+            <p>Rating: {movie.rating.toFixed(1)}</p>
+            <p>Genre: {movie.genre.join(', ')}</p>
           </div>
         ))}
       </div>

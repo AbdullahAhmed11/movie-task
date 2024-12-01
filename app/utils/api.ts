@@ -1,15 +1,17 @@
-// utils/api.ts
 import axios from 'axios';
 
-// Create an Axios instance for API requests
+const API_BASE_URL = 'https://freetestapi.com/api/v1/movies';
 
-// Fetch movies with optional query parameters
-export const fetchMovies = async (query: string = '') => {
+export const fetchMovies = async (query: string) => {
   try {
-    const response = await axios.get(`https://cors-anywhere.herokuapp.com/https://freetestapi.com/api/v1/movies${query}`);;
+    const response = await axios.get(`https://cors-anywhere.herokuapp.com/${API_BASE_URL}?search=${query}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   } catch (error) {
     console.log(error)
-    throw new Error('Failed to fetch movies.');
+    throw new Error('Failed to fetch movies. Please try again.');
   }
 };
