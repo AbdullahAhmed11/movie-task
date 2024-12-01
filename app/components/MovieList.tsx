@@ -23,12 +23,15 @@ const MovieList = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://cors-anywhere.herokuapp.com/https://freetestapi.com/api/v1/movies?search=${query}&rating=1`
+        `https://cors-anywhere.herokuapp.com/https://freetestapi.com/api/v1/movies?search=${query}`
       );
       setMovies(response.data);
-    } catch (err: any) {
-      setError(err.message);
-    } 
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }    } 
     finally {
       setLoading(false);
     }
@@ -69,5 +72,3 @@ const MovieList = () => {
 };
 
 export default MovieList;
-
-
