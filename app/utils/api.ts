@@ -11,6 +11,7 @@ export const fetchMovies = async (query: string) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error)
     throw new Error('Failed to fetch movies. Please try again.');
   }
 };

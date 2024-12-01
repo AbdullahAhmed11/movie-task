@@ -28,7 +28,9 @@ const MovieList = () => {
         setMovies(data);
       } catch (err) {
         setError((err as Error).message);
-      } 
+      } finally  {
+        setLoading(false)
+      }
     };
 
     loadMovies();
