@@ -29,9 +29,9 @@ const MovieList = () => {
     } catch (err: any) {
       setError(err.message);
     } 
-    // finally {
-    //   setLoading(false);
-    // }
+    finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
